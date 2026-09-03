@@ -1,49 +1,154 @@
 # Student Management
 
-A simple Flask student management application using Supabase for storage.
+A Flask web application for creating, viewing, editing, and deleting student records. Student data is stored in Supabase.
 
-## Project Structure
+## Requirements
 
-```text
-Student_management/
-├── controllers/
-│   └── student_controller.py
-├── models/
-│   └── student_model.py
-├── routes/
-│   └── student_routes.py
-├── templates/
-│   ├── base.html
-│   └── students/
-│       ├── index.html
-│       └── form.html
-├── static/
-│   └── css/
-│       └── style.css
-├── .env.example
-├── .gitignore
-├── database.py
-├── requirements.txt
-├── run.py
-├── supabase.sql
-└── README.md
-```
+- Python 3.11 or newer
+- A Supabase project
+- Git
 
-## Setup
+## Setup For A New Developer
 
-1. Create and activate a virtual environment.
-2. Install dependencies:
+### 1. Clone the repository
 
 ```bash
-pip install -r requirements.txt
+git clone https://github.com/sehrishsiddique853/student_management.git
+cd student_management
 ```
 
-3. Copy `.env.example` to `.env` and add your Supabase credentials.
-4. Run the SQL in `supabase.sql` inside your Supabase SQL editor.
-5. Start the app:
+### 2. Create a virtual environment
+
+Windows PowerShell:
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+macOS or Linux:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+When activated, the terminal should show `(venv)` before the prompt.
+
+### 3. Install dependencies
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+### 4. Configure Supabase
+
+1. Create or open the team Supabase project.
+2. Open **Project Settings > Data API** and copy the project URL.
+3. Open **Project Settings > API Keys** and copy the publishable/anon key. Do not use a service-role key in this application.
+4. Create a local `.env` file from the example:
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+macOS or Linux:
+
+```bash
+cp .env.example .env
+```
+
+5. Edit `.env`:
+
+```env
+FLASK_SECRET_KEY=replace-with-a-random-secret
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-supabase-publishable-or-anon-key
+```
+
+The `.env` file is ignored by Git and must never be committed.
+
+### 5. Create the database table
+
+1. In Supabase, open **SQL Editor** and create a new query.
+2. Copy and run the complete contents of `supabase.sql`.
+3. Confirm that `public.students` contains these columns:
+
+	- `id`
+	- `name`
+	- `email`
+	- `age`
+	- `course`
+	- `created_at`
+
+The `email` column is unique. The `age` migration is included because an existing `students` table may have been created before the age field was added.
+
+### 6. Start the application
 
 ```bash
 python run.py
 ```
 
-Open `http://127.0.0.1:5000` in your browser.
+Open <http://127.0.0.1:5000> in a browser. Stop the development server with `Ctrl+C`.
+
+## Application Features
+
+- View all students on the home page
+- Add a student with name, email, age, and course
+- Edit an existing student
+- Delete a student
+- Prevent duplicate email addresses through the database constraint
+
+## Project Structure
+
+```text
+Student_management/
+├── controllers/              # Request handling and validation
+├── models/                   # Supabase database operations
+├── routes/                   # Flask URL routes
+├── templates/                # Jinja2 HTML templates
+├── static/css/               # Application styles
+├── .env.example              # Environment variable template
+├── database.py               # Supabase client setup
+├── requirements.txt          # Python dependencies
+├── run.py                    # Flask application entry point
+├── supabase.sql              # Database schema and migration
+└── README.md
+```
+
+## Common Problems
+
+### `SUPABASE_URL is missing from .env`
+
+Make sure the file is named `.env`, is in the project root beside `run.py`, and contains `SUPABASE_URL`.
+
+### `Invalid API key`
+
+Check that `SUPABASE_KEY` is copied from the same Supabase project and does not include quotation marks or extra spaces.
+
+### `Could not find the 'age' column`
+
+Run the complete `supabase.sql` file in the Supabase SQL Editor. Editing the local SQL file does not update the hosted database.
+
+### `Email already exists`
+
+Email addresses must be unique. Check the existing record in Supabase before trying another insert.
+
+## Git Workflow
+
+Before starting work:
+
+```bash
+git pull origin main
+```
+
+After making changes:
+
+```bash
+git add .
+git commit -m "Describe the change"
+git push origin main
+```
