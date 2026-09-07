@@ -5,6 +5,7 @@ from controllers.student_controller import (
     create_student,
     get_student,
     update_student,
+    patch_student,
     delete_student
 )
 
@@ -43,7 +44,15 @@ student_bp.add_url_rule(
     "/students/<int:student_id>",
     endpoint="update",
     view_func=update_student,
-    methods=["PUT", "PATCH"]
+    methods=["PUT"]
+)
+
+
+student_bp.add_url_rule(
+    "/students/<int:student_id>",
+    endpoint="patch",
+    view_func=patch_student,
+    methods=["PATCH"]
 )
 
 

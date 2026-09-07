@@ -64,6 +64,15 @@ def create_app():
                         "age": {"type": "integer", "example": 21, "nullable": True},
                         "course": {"type": "string", "example": "Computer Science", "nullable": True}
                     }
+                },
+                "StudentPatch": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string", "example": "Ali Khan"},
+                        "email": {"type": "string", "example": "ali@example.com"},
+                        "age": {"type": "integer", "example": 21, "nullable": True},
+                        "course": {"type": "string", "example": "Computer Science", "nullable": True}
+                    }
                 }
             }
         }

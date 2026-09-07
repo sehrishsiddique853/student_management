@@ -128,6 +128,54 @@ def update_student(student_id):
     if not student:
         return jsonify({"error": "Student not found"}), 404
 
+    data, error = _student_data_from_request()
+    if error:
+        return jsonify({"error": error}), 400
+
+    try:
+        students = StudentModel.update(student_id, data)
+        return jsonify(students[0] if students else {**student, **data})
+    except Exception as error:
+        return _database_error(error)
+
+
+def patch_student(student_id):
+    """
+        Partially update a student
+        ---
+        tags:
+            - Students
+        consumes:
+            - application/json
+        parameters:
+            - in: path
+              name: student_id
+              required: true
+              type: integer
+            - in: body
+              name: student
+              required: true
+              schema:
+                $ref: '#/definitions/StudentPatch'
+        responses:
+            200:
+                description: Student partially updated successfully
+                schema:
+                    $ref: '#/definitions/Student'
+            400:
+                description: Invalid request body
+            404:
+                description: Student not found
+            409:
+                description: Email already exists
+            500:
+                description: Database error
+    """
+    student = StudentModel.get_by_id(student_id)
+
+    if not student:
+        return jsonify({"error": "Student not found"}), 404
+
     data, error = _student_data_from_request(partial=True)
     if error:
         return jsonify({"error": error}), 400
