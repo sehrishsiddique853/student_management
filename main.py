@@ -71,6 +71,14 @@ def create_app():
 
     app.register_blueprint(student_bp)
 
+    @app.route("/")
+    def home():
+        return {
+            "message": "Student Management API is running",
+            "status": "success",
+            "documentation": "/api/swagger/"
+        }
+
     return app
 
 
