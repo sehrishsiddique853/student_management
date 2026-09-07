@@ -15,32 +15,32 @@ student_bp = Blueprint(
 
 
 student_bp.add_url_rule(
-    "/",
-    endpoint="index",
+    "/students",
+    endpoint="list",
     view_func=list_students,
     methods=["GET"]
 )
 
 
 student_bp.add_url_rule(
-    "/students/create",
+    "/students",
     endpoint="create",
     view_func=create_student,
-    methods=["GET", "POST"]
+    methods=["POST"]
 )
 
 
 student_bp.add_url_rule(
-    "/students/<int:student_id>/edit",
+    "/students/<int:student_id>",
     endpoint="edit",
     view_func=edit_student,
-    methods=["GET", "POST"]
+    methods=["GET", "PUT", "PATCH"]
 )
 
 
 student_bp.add_url_rule(
-    "/students/<int:student_id>/delete",
+    "/students/<int:student_id>",
     endpoint="delete",
     view_func=delete_student,
-    methods=["POST"]
+    methods=["DELETE"]
 )

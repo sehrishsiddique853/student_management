@@ -1,177 +1,189 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import jsonify, request
 
 from models.student_model import StudentModel
 
 
 def list_students():
-    students = StudentModel.get_all()
-
-    return render_template(
-        "students/index.html",
-        students=students
-    )
+    """
+        List all students
+        ---
+        tags:
+            - Students
+        responses:
+            200:
+                description: A list of students
+                schema:
+                    type: array
+                    items:
+                        $ref: '#/definitions/Student'
+            500:
+                description: Database error
+    """
+    try:
+        return jsonify(StudentModel.get_all())
+    except Exception as error:
+        return jsonify({"error": str(error)}), 500
 
 
 def create_student():
-    if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        email = request.form.get("email", "").strip()
-        age = request.form.get("age", "").strip()
-        course = request.form.get("course", "").strip()
+    """
+        Create a student
+        ---
+        tags:
+            - Students
+        consumes:
+            - application/json
+        parameters:
+            - in: body
+              name: student
+              required: true
+              schema:
+                $ref: '#/definitions/StudentInput'
+        responses:
+            201:
+                description: Student created successfully
+                schema:
+                    $ref: '#/definitions/Student'
+            400:
+                description: Invalid request body
+            409:
+                description: Email already exists
+            500:
+                description: Database error
+    """
+    data, error = _student_data_from_request()
+    if error:
+        return jsonify({"error": error}), 400
 
-        if not name:
-            flash("Name is required.", "danger")
-            return render_template(
-                "students/form.html",
-                mode="create"
-            )
-
-        if not email:
-            flash("Email is required.", "danger")
-            return render_template(
-                "students/form.html",
-                mode="create"
-            )
-
-        try:
-            age = int(age) if age else None
-
-            StudentModel.create({
-                "name": name,
-                "email": email,
-                "age": age,
-                "course": course
-            })
-
-            flash(
-                "Student created successfully.",
-                "success"
-            )
-
-            return redirect(
-                url_for("students.index")
-            )
-
-        except ValueError:
-            flash(
-                "Age must be a valid number.",
-                "danger"
-            )
-
-        except Exception as error:
-            print(error)
-
-            flash(
-                f"Could not create student: {error}",
-                "danger"
-            )
-
-    return render_template(
-        "students/form.html",
-        mode="create"
-    )
+    try:
+        students = StudentModel.create(data)
+        return jsonify(students[0] if students else data), 201
+    except Exception as error:
+        return _database_error(error)
 
 
 def edit_student(student_id):
+    """
+        Get or update a student
+        ---
+        tags:
+            - Students
+        parameters:
+            - in: path
+              name: student_id
+              required: true
+              type: integer
+            - in: body
+              name: student
+              required: false
+              schema:
+                $ref: '#/definitions/StudentInput'
+        consumes:
+            - application/json
+        responses:
+            200:
+                description: Student returned or updated successfully
+                schema:
+                    $ref: '#/definitions/Student'
+            400:
+                description: Invalid request body
+            404:
+                description: Student not found
+            409:
+                description: Email already exists
+            500:
+                description: Database error
+    """
     student = StudentModel.get_by_id(student_id)
 
     if not student:
-        flash("Student not found.", "danger")
+        return jsonify({"error": "Student not found"}), 404
 
-        return redirect(
-            url_for("students.index")
-        )
+    if request.method == "GET":
+        return jsonify(student)
 
-    if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        email = request.form.get("email", "").strip()
-        age = request.form.get("age", "").strip()
-        course = request.form.get("course", "").strip()
+    data, error = _student_data_from_request(partial=True)
+    if error:
+        return jsonify({"error": error}), 400
 
-        if not name or not email:
-            flash(
-                "Name and email are required.",
-                "danger"
-            )
-
-            return render_template(
-                "students/form.html",
-                mode="edit",
-                student=student
-            )
-
-        try:
-            age = int(age) if age else None
-
-            StudentModel.update(
-                student_id,
-                {
-                    "name": name,
-                    "email": email,
-                    "age": age,
-                    "course": course
-                }
-            )
-
-            flash(
-                "Student updated successfully.",
-                "success"
-            )
-
-            return redirect(
-                url_for("students.index")
-            )
-
-        except ValueError:
-            flash(
-                "Age must be a valid number.",
-                "danger"
-            )
-
-        except Exception as error:
-            print(error)
-
-            flash(
-                "Could not update student.",
-                "danger"
-            )
-
-    return render_template(
-        "students/form.html",
-        mode="edit",
-        student=student
-    )
+    try:
+        students = StudentModel.update(student_id, data)
+        return jsonify(students[0] if students else {**student, **data})
+    except Exception as error:
+        return _database_error(error)
 
 
 def delete_student(student_id):
-    student = StudentModel.get_by_id(student_id)
+    """
+        Delete a student
+        ---
+        tags:
+            - Students
+        parameters:
+            - in: path
+              name: student_id
+              required: true
+              type: integer
+        responses:
+            204:
+                description: Student deleted successfully
+            404:
+                description: Student not found
+            500:
+                description: Database error
+    """
+    try:
+        if not StudentModel.get_by_id(student_id):
+            return jsonify({"error": "Student not found"}), 404
 
-    if not student:
-        flash(
-            "Student not found.",
-            "danger"
-        )
-
-        return redirect(
-            url_for("students.index")
-        )
+    except Exception as error:
+        return _database_error(error)
 
     try:
         StudentModel.delete(student_id)
-
-        flash(
-            "Student deleted successfully.",
-            "success"
-        )
-
+        return "", 204
     except Exception as error:
-        print(error)
+        return _database_error(error)
 
-        flash(
-            "Could not delete student.",
-            "danger"
-        )
 
-    return redirect(
-        url_for("students.index")
-    )
+def _student_data_from_request(partial=False):
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return None, "Request body must be a JSON object"
+
+    allowed_fields = {"name", "email", "age", "course"}
+    unknown_fields = set(data) - allowed_fields
+    if unknown_fields:
+        return None, f"Unknown fields: {', '.join(sorted(unknown_fields))}"
+
+    if not partial and ("name" not in data or "email" not in data):
+        return None, "Name and email are required"
+
+    if "name" in data:
+        if not isinstance(data["name"], str) or not data["name"].strip():
+            return None, "Name is required"
+        data["name"] = data["name"].strip()
+
+    if "email" in data:
+        if not isinstance(data["email"], str) or not data["email"].strip():
+            return None, "Email is required"
+        data["email"] = data["email"].strip()
+
+    if "age" in data and data["age"] is not None:
+        if isinstance(data["age"], bool) or not isinstance(data["age"], int):
+            return None, "Age must be an integer or null"
+        if data["age"] < 0:
+            return None, "Age cannot be negative"
+
+    if "course" in data and data["course"] is not None:
+        if not isinstance(data["course"], str):
+            return None, "Course must be a string or null"
+        data["course"] = data["course"].strip()
+
+    return data, None
+
+
+def _database_error(error):
+    message = str(error)
+    status_code = 409 if "duplicate" in message.lower() or "unique" in message.lower() else 500
+    return jsonify({"error": message}), status_code

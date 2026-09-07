@@ -1,6 +1,6 @@
 # Student Management
 
-A Flask web application for creating, viewing, editing, and deleting student records. Student data is stored in Supabase.
+A Flask REST API for creating, viewing, editing, and deleting student records. Student data is stored in Supabase.
 
 ## Requirements
 
@@ -73,9 +73,7 @@ The `.env` file is ignored by Git and must never be committed.
 
 ### 5. Create the database table
 
-1. In Supabase, open **SQL Editor** and create a new query.
-2. Copy and run the complete contents of `supabase.sql`.
-3. Confirm that `public.students` contains these columns:
+In Supabase, create a `public.students` table and confirm that it contains:
 
 	- `id`
 	- `name`
@@ -89,17 +87,18 @@ The `email` column is unique. The `age` migration is included because an existin
 ### 6. Start the application
 
 ```bash
-python run.py
+python main.py
 ```
 
-Open <http://127.0.0.1:5000> in a browser. Stop the development server with `Ctrl+C`.
+The API is available at <http://127.0.0.1:5000/students>. Stop the development server with `Ctrl+C`.
 
 ## Application Features
 
-- View all students on the home page
-- Add a student with name, email, age, and course
-- Edit an existing student
-- Delete a student
+- `GET /students` lists all students
+- `POST /students` creates a student
+- `GET /students/<id>` returns one student
+- `PUT` or `PATCH /students/<id>` updates a student
+- `DELETE /students/<id>` deletes a student
 - Prevent duplicate email addresses through the database constraint
 
 ## Project Structure
@@ -109,13 +108,10 @@ Student_management/
 ├── controllers/              # Request handling and validation
 ├── models/                   # Supabase database operations
 ├── routes/                   # Flask URL routes
-├── templates/                # Jinja2 HTML templates
-├── static/css/               # Application styles
 ├── .env.example              # Environment variable template
 ├── database.py               # Supabase client setup
 ├── requirements.txt          # Python dependencies
-├── run.py                    # Flask application entry point
-├── supabase.sql              # Database schema and migration
+├── main.py                   # Flask application entry point
 └── README.md
 ```
 
@@ -123,15 +119,11 @@ Student_management/
 
 ### `SUPABASE_URL is missing from .env`
 
-Make sure the file is named `.env`, is in the project root beside `run.py`, and contains `SUPABASE_URL`.
+Make sure the file is named `.env`, is in the project root beside `main.py`, and contains `SUPABASE_URL`.
 
 ### `Invalid API key`
 
 Check that `SUPABASE_KEY` is copied from the same Supabase project and does not include quotation marks or extra spaces.
-
-### `Could not find the 'age' column`
-
-Run the complete `supabase.sql` file in the Supabase SQL Editor. Editing the local SQL file does not update the hosted database.
 
 ### `Email already exists`
 
