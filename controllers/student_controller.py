@@ -62,9 +62,9 @@ def create_student():
         return _database_error(error)
 
 
-def edit_student(student_id):
+def get_student(student_id):
     """
-        Get or update a student
+        Get a student
         ---
         tags:
             - Students
@@ -73,16 +73,45 @@ def edit_student(student_id):
               name: student_id
               required: true
               type: integer
-            - in: body
-              name: student
-              required: false
-              schema:
-                $ref: '#/definitions/StudentInput'
-        consumes:
-            - application/json
         responses:
             200:
-                description: Student returned or updated successfully
+                description: Student returned successfully
+                schema:
+                    $ref: '#/definitions/Student'
+            404:
+                description: Student not found
+            500:
+                description: Database error
+    """
+    student = StudentModel.get_by_id(student_id)
+
+    if not student:
+        return jsonify({"error": "Student not found"}), 404
+
+    return jsonify(student)
+
+
+def update_student(student_id):
+    """
+        Update a student
+        ---
+        tags:
+            - Students
+        consumes:
+            - application/json
+        parameters:
+            - in: path
+              name: student_id
+              required: true
+              type: integer
+            - in: body
+              name: student
+              required: true
+              schema:
+                $ref: '#/definitions/StudentInput'
+        responses:
+            200:
+                description: Student updated successfully
                 schema:
                     $ref: '#/definitions/Student'
             400:
@@ -98,9 +127,6 @@ def edit_student(student_id):
 
     if not student:
         return jsonify({"error": "Student not found"}), 404
-
-    if request.method == "GET":
-        return jsonify(student)
 
     data, error = _student_data_from_request(partial=True)
     if error:

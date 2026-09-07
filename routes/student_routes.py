@@ -3,7 +3,8 @@ from flask import Blueprint
 from controllers.student_controller import (
     list_students,
     create_student,
-    edit_student,
+    get_student,
+    update_student,
     delete_student
 )
 
@@ -32,9 +33,17 @@ student_bp.add_url_rule(
 
 student_bp.add_url_rule(
     "/students/<int:student_id>",
-    endpoint="edit",
-    view_func=edit_student,
-    methods=["GET", "PUT", "PATCH"]
+    endpoint="get",
+    view_func=get_student,
+    methods=["GET"]
+)
+
+
+student_bp.add_url_rule(
+    "/students/<int:student_id>",
+    endpoint="update",
+    view_func=update_student,
+    methods=["PUT", "PATCH"]
 )
 
 
