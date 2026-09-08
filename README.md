@@ -101,6 +101,29 @@ The API is available at <http://127.0.0.1:5000/students>. Stop the development s
 - `DELETE /students/<id>` deletes a student
 - Prevent duplicate email addresses through the database constraint
 
+## Authentication
+
+- `POST /auth/register` creates an email/password user
+- `POST /auth/login` returns Supabase access and refresh tokens
+- `GET /auth/me` returns the authenticated user
+- `GET /auth/oauth/<provider>` starts OAuth login for `google`, `github`, `azure`, `facebook`, or `apple`
+- `GET /auth/oauth/callback` completes the browser OAuth flow
+- `POST /auth/oauth/callback` exchanges an OAuth code and PKCE verifier supplied by a client
+
+Protect student endpoints with the login or OAuth access token:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+For OAuth, set the callback URL in Supabase Authentication URL Configuration. Locally use:
+
+```text
+http://127.0.0.1:5000/auth/oauth/callback
+```
+
+For a deployed environment, set `OAUTH_REDIRECT_URL` to the deployed callback URL and add that URL to Supabase's allowed redirect URLs.
+
 ## Project Structure
 
 ```text

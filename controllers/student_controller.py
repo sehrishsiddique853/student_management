@@ -9,6 +9,8 @@ def list_students():
         ---
         tags:
             - Students
+        security:
+            - bearerAuth: []
         responses:
             200:
                 description: A list of students
@@ -31,6 +33,8 @@ def create_student():
         ---
         tags:
             - Students
+        security:
+            - bearerAuth: []
         consumes:
             - application/json
         parameters:
@@ -68,6 +72,8 @@ def get_student(student_id):
         ---
         tags:
             - Students
+        security:
+            - bearerAuth: []
         parameters:
             - in: path
               name: student_id
@@ -97,6 +103,8 @@ def update_student(student_id):
         ---
         tags:
             - Students
+        security:
+            - bearerAuth: []
         consumes:
             - application/json
         parameters:
@@ -145,6 +153,8 @@ def patch_student(student_id):
         ---
         tags:
             - Students
+        security:
+            - bearerAuth: []
         consumes:
             - application/json
         parameters:
@@ -193,6 +203,8 @@ def delete_student(student_id):
         ---
         tags:
             - Students
+        security:
+            - bearerAuth: []
         parameters:
             - in: path
               name: student_id

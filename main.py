@@ -1,11 +1,11 @@
 import os
 
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, app
 from flasgger import Swagger
 
 from routes.student_routes import student_bp
-
+from routes.auth_routes import auth_bp
 
 load_dotenv()
 
@@ -30,7 +30,9 @@ def create_app():
                 {
                     "endpoint": "apispec_1",
                     "route": "/api/swagger.json",
-                    "rule_filter": lambda rule: True,
+                    "rule_filter": lambda rule: (
+                        rule.endpoint != "auth.oauth_callback"
+                    ),
                     "model_filter": lambda tag: True
                 }
             ],
@@ -74,11 +76,20 @@ def create_app():
                         "course": {"type": "string", "example": "Computer Science", "nullable": True}
                     }
                 }
+            },
+            "securityDefinitions": {
+                "bearerAuth": {
+                    "type": "apiKey",
+                    "name": "Authorization",
+                    "in": "header",
+                    "description": "Enter: Bearer <Supabase access token>"
+                }
             }
         }
     )
 
     app.register_blueprint(student_bp)
+    app.register_blueprint(auth_bp)
 
     @app.route("/")
     def home():
