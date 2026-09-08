@@ -1,4 +1,4 @@
-from database import supabase
+from database import get_database_client
 
 
 class StudentModel:
@@ -7,7 +7,7 @@ class StudentModel:
     @classmethod
     def get_all(cls):
         response = (
-            supabase.table(cls.TABLE)
+            get_database_client().table(cls.TABLE)
             .select("*")
             .order("id", desc=False)
             .execute()
@@ -17,7 +17,7 @@ class StudentModel:
     @classmethod
     def get_by_id(cls, student_id):
         response = (
-            supabase.table(cls.TABLE)
+            get_database_client().table(cls.TABLE)
             .select("*")
             .eq("id", student_id)
             .limit(1)
@@ -32,7 +32,7 @@ class StudentModel:
     @classmethod
     def create(cls, data):
         response = (
-            supabase.table(cls.TABLE)
+            get_database_client().table(cls.TABLE)
             .insert(data)
             .execute()
         )
@@ -41,7 +41,7 @@ class StudentModel:
     @classmethod
     def update(cls, student_id, data):
         response = (
-            supabase.table(cls.TABLE)
+            get_database_client().table(cls.TABLE)
             .update(data)
             .eq("id", student_id)
             .execute()
@@ -51,7 +51,7 @@ class StudentModel:
     @classmethod
     def delete(cls, student_id):
         response = (
-            supabase.table(cls.TABLE)
+            get_database_client().table(cls.TABLE)
             .delete()
             .eq("id", student_id)
             .execute()

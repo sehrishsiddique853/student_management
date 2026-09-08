@@ -271,5 +271,11 @@ def _student_data_from_request(partial=False):
 
 def _database_error(error):
     message = str(error)
-    status_code = 409 if "duplicate" in message.lower() or "unique" in message.lower() else 500
+    lowered_message = message.lower()
+    if "duplicate" in lowered_message or "unique" in lowered_message:
+        status_code = 409
+    elif "row-level security" in lowered_message or "permission denied" in lowered_message:
+        status_code = 403
+    else:
+        status_code = 500
     return jsonify({"error": message}), status_code

@@ -30,9 +30,7 @@ def create_app():
                 {
                     "endpoint": "apispec_1",
                     "route": "/api/swagger.json",
-                    "rule_filter": lambda rule: (
-                        rule.endpoint != "auth.oauth_callback"
-                    ),
+                    "rule_filter": lambda rule: True,
                     "model_filter": lambda tag: True
                 }
             ],

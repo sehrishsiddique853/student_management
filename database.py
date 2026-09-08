@@ -1,5 +1,6 @@
 import os
 
+from flask import g
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
@@ -22,3 +23,7 @@ supabase: Client = create_client(
     SUPABASE_URL,
     SUPABASE_KEY
 )
+
+
+def get_database_client():
+    return getattr(g, "database_client", supabase)
