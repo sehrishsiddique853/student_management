@@ -2,3 +2,4 @@ Flask==3.0.3
 flasgger==0.9.7.1
 python-dotenv==1.0.1
 supabase==2.31.0
+resend==2.23.0

@@ -10,6 +10,7 @@ load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
 
 if not SUPABASE_URL:
@@ -23,6 +24,13 @@ supabase: Client = create_client(
     SUPABASE_URL,
     SUPABASE_KEY
 )
+
+admin_supabase = None
+if SUPABASE_SERVICE_ROLE_KEY:
+    admin_supabase = create_client(
+        SUPABASE_URL,
+        SUPABASE_SERVICE_ROLE_KEY
+    )
 
 
 def get_database_client():

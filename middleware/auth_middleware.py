@@ -22,6 +22,7 @@ def require_auth(view_func):
 			if not user_response or not user_response.user:
 				raise ValueError("Invalid access token")
 			g.current_user = user_response.user
+			g.access_token = token.strip()
 			database_client = create_client(SUPABASE_URL, SUPABASE_KEY)
 			database_client.postgrest.auth(token.strip())
 			g.database_client = database_client
